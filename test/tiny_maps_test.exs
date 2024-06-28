@@ -1,7 +1,7 @@
-defmodule ShorterMapsTest do
+defmodule TinyMapsTest do
   alias ExUnit.TestModule
   use ExUnit.Case
-  import ShorterMaps
+  import TinyMaps
 
   def eval(quoted_code), do: fn -> Code.eval_quoted(quoted_code) end
 
@@ -319,7 +319,7 @@ defmodule ShorterMapsTest do
       %{a: [], len: 0} = ~M{a, len: length(a)}
     end
 
-    test "embedded shortermap" do
+    test "embedded tinymap" do
       a = 1
       b = 2
       assert %{a: ^a, b: %{b: ^b}} = ~M{a, b: ~M(b)}
@@ -362,7 +362,7 @@ defmodule ShorterMapsTest do
 
     test "of import shadowing" do
       defmodule Test do
-        import ShorterMaps
+        import TinyMaps
 
         def test do
           get_struct(:a)
