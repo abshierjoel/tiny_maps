@@ -21,7 +21,7 @@ defmodule TinyMaps.Mixfile do
   end
 
   def application do
-    [applications: []]
+    [extra_applications: [:logger]]
   end
 
   defp hex_package do
