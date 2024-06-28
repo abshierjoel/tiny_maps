@@ -7,7 +7,7 @@ matrix:
     - otp_release: 20.0
       elixir: 1.5.0
     - otp_release: 26.2.1
-      elixir: 1.16.0
+      elixir: 1.16.3
 
 script:
   - mix test
