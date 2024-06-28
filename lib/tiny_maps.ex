@@ -1,4 +1,4 @@
-defmodule ShorterMaps do
+defmodule TinyMaps do
   @readme Path.join(__DIR__, "../README.md")
   @external_resource @readme
   {:ok, readme_contents} = File.read(@readme)
@@ -92,7 +92,7 @@ defmodule ShorterMaps do
       Code.string_to_quoted!(final_string, file: __ENV__.file, line: line)
     else
       {:error, step, reason} ->
-        raise(ArgumentError, "ShorterMaps parse error in step: #{step}, reason: #{reason}")
+        raise(ArgumentError, "TinyMaps parse error in step: #{step}, reason: #{reason}")
     end
   end
 

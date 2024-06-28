@@ -1,12 +1,12 @@
-defmodule ShorterMaps.Mixfile do
+defmodule TinyMaps.Mixfile do
   use Mix.Project
 
-  @version "2.2.5"
-  @repo_url "https://github.com/meyercm/shorter_maps"
+  @version "3.0.0"
+  @repo_url "https://github.com/abshierjoel/tiny_maps"
 
   def project do
     [
-      app: :shorter_maps,
+      app: :tiny_maps,
       version: @version,
       elixir: "~> 1.0",
       build_embedded: Mix.env() == :prod,
@@ -16,7 +16,7 @@ defmodule ShorterMaps.Mixfile do
       package: hex_package(),
       description: "~M sigil for map shorthand. `~M{id, name} ~> %{id: id, name: name}`",
       # Docs
-      name: "ShorterMaps"
+      name: "TinyMaps"
     ]
   end
 
@@ -25,7 +25,7 @@ defmodule ShorterMaps.Mixfile do
   end
 
   defp hex_package do
-    [maintainers: ["Chris Meyer"], licenses: ["MIT"], links: %{"GitHub" => @repo_url}]
+    [maintainers: ["Joel Abshier"], licenses: ["MIT"], links: %{"GitHub" => @repo_url}]
   end
 
   defp deps do
