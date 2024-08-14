@@ -9,6 +9,7 @@ defmodule TinyMaps.Mixfile do
       app: :tiny_maps,
       version: @version,
       elixir: "~> 1.0",
+      otp: "~> 21",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       deps: deps(),
