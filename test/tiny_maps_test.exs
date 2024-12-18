@@ -50,6 +50,13 @@ defmodule TinyMapsTest do
       assert %{"key_1" => "value_1", "key_2" => :val_2} = ~m{key_1, "key_2" => key_2_alt}
     end
 
+    test "atom key is converted to string" do
+      a = 1
+      b_alt = 3
+
+      assert %{"a" => 1, "atom_key" => 3} = ~m{a, atom_key: b_alt}
+    end
+
     test "raises on invalid varnames" do
       code = quote do: ~m{4asdf}
       assert_raise(SyntaxError, eval(code))
