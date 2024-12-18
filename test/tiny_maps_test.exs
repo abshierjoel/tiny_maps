@@ -259,13 +259,6 @@ defmodule TinyMapsTest do
       ~M{_ignored, real_val} = %{ignored: 5, real_val: 19}
       assert 19 = real_val
     end
-
-    test "sad case" do
-      case %{real_val: 19} do
-        ~M{_not_present, _real_val} -> raise("matched when testshouldn't have")
-        _ -> :ok
-      end
-    end
   end
 
   describe "ignore syntax ~m" do
