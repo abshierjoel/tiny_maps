@@ -52,5 +52,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-mix-${{ env.cache-name }}-
 
+      - name: Compile warnings as errors
+        run: mix compile --warnings-as-errors
+
       - name: Run tests
         run: mix test
