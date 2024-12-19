@@ -96,6 +96,50 @@ defmodule TinyMaps do
     end
   end
 
+  @doc """
+  Expands an atom-keyed keyword list with the given keys bound to variables
+  with the same name.
+
+  Because `~K` operates on atoms, it is compatible with Structs.
+
+  ## Examples:
+
+      # Keyword List construction:
+      iex> tty = "/dev/ttyUSB0"
+      ...> baud = 19200
+      ...> device = ~K{tty, baud}
+      [baud: 19200, tty: "/dev/ttyUSB0"]
+
+      # Keyword List with field
+      iex> id = 100
+      ...> name = "John"
+      ...> ~K{id, creator: name}
+      [id: 100, creator: "John"]
+  """
+  defmacro sigil_K(term, modifiers)
+
+  defmacro sigil_K({:<<>>, fields, [string]}, modifiers) do
+    case Keyword.get(fields, :line) do
+      nil -> raise ArgumentError, "interpolation is not supported with the ~K sigil"
+      line -> do_sigil_K(string, line, modifier(modifiers, @default_modifier_M))
+    end
+  end
+
+  defmacro sigil_K({:<<>>, _, _}, _modifiers) do
+    raise ArgumentError, "interpolation is not supported with the ~K sigil"
+  end
+
+  defp do_sigil_K(raw_string, line, modifier) do
+    with {:ok, _, rest} <- get_struct(raw_string),
+         {:ok, keys_and_values} <- expand_variables(rest, modifier) do
+      final_string = "[#{keys_and_values}]"
+      Code.string_to_quoted!(final_string, file: __ENV__.file, line: line)
+    else
+      {:error, step, reason} ->
+        raise(ArgumentError, "TinyMaps parse error in step: #{step}, reason: #{reason}")
+    end
+  end
+
   @doc false
   # expecting something like: '%StructName key1, key2' -or- '%StructName oldmap|key1, key2'
   # returns {:ok, old_map, keys_and_vars} | {:ok, "", keys_and_vars}
