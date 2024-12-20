@@ -13,12 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **BREAKING**: Fixed a longstanding "bug" where the `~m{}` sigil did not return string keys for key renames.
-
 ### Removed
-
-- Trademark sign previously shown after the project description in version
-  0.3.0
 
 ## [v3.0.0]
 
