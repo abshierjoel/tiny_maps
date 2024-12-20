@@ -5,6 +5,33 @@ defmodule TinyMapsTest do
 
   def eval(quoted_code), do: fn -> Code.eval_quoted(quoted_code) end
 
+  describe "keyword list construction ~K" do
+    test "with one key" do
+      key = "value"
+
+      assert [key: "value"] = ~K{key}
+    end
+
+    test "with multiple key" do
+      key_1 = "value1"
+      key_2 = :value2
+
+      assert [key_1: "value1", key_2: :value2] = ~K{key_1, key_2}
+    end
+
+    test "with mixed keys" do
+      key_1 = "val1"
+      key_2_alt = :val2
+
+      assert [key_1: "val1", key_2: :val2] = ~K{key_1, key_2: key_2_alt}
+    end
+
+    test "raises on invalid varnames" do
+      quoted = quote do: ~K{4asdf}
+      assert_raise(SyntaxError, eval(quoted))
+    end
+  end
+
   describe "map construction ~M" do
     test "with one key" do
       key = "value"
@@ -69,6 +96,12 @@ defmodule TinyMapsTest do
       assert 2 = key_2
     end
 
+    test "for ~K" do
+      ~K{key_1, key_2} = [key_1: 1, key_2: 2]
+      assert 1 = key_1
+      assert 2 = key_2
+    end
+
     test "with mixed_keys" do
       ~M{key_1, key_2: key_2_alt} = %{key_1: :val_1, key_2: "val 2"}
       assert :val_1 = key_1
@@ -85,12 +118,14 @@ defmodule TinyMapsTest do
     defmodule TestModule do
       def test(~M{key_1, key_2}), do: {:first, key_1, key_2}
       def test(~m{key_1}), do: {:second, key_1}
+      def test(~K[key_1: key_1, key_2: key_2]), do: {:third, key_1, key_2}
       def test(_), do: :third
     end
 
     test "matches in module function heads" do
       assert {:first, 1, 2} = TestModule.test(%{key_1: 1, key_2: 2})
       assert {:second, 1} = TestModule.test(%{"key_1" => 1})
+      assert {:third, 1, 2} = TestModule.test(key_1: 1, key_2: 2)
     end
   end
 
@@ -99,11 +134,13 @@ defmodule TinyMapsTest do
       fun = fn
         ~m{foo} -> {:first, foo}
         ~M{foo} -> {:second, foo}
+        ~K{foo} -> {:third, foo}
         _ -> :no_match
       end
 
       assert fun.(%{"foo" => "bar"}) == {:first, "bar"}
       assert fun.(%{foo: "barr"}) == {:second, "barr"}
+      assert fun.(foo: "barrr") == {:third, "barrr"}
       assert fun.(%{baz: "bong"}) == :no_match
     end
   end
@@ -222,6 +259,22 @@ defmodule TinyMapsTest do
     end
   end
 
+  describe "pin syntax ~K" do
+    test "matching pin" do
+      matching = 5
+      ~K{^matching} = [matching: 5]
+    end
+
+    test "non-matching pin" do
+      not_matching = 5
+
+      case Keyword.new(not_matching: 6) do
+        ~K{^not_matching} -> raise("matched when testshouldn't have")
+        _ -> :ok
+      end
+    end
+  end
+
   describe "pin syntax ~M" do
     test "happy case" do
       matching = 5
@@ -249,6 +302,25 @@ defmodule TinyMapsTest do
 
       case %{"not_matching" => 6} do
         ~m{^not_matching} -> raise("matched when testshouldn't have")
+        _ -> :ok
+      end
+    end
+  end
+
+  describe "ignore syntax ~K" do
+    test "ignore one key" do
+      ~K{_ignored, real_val} = [ignored: 5, real_val: 19]
+      assert 19 = real_val
+    end
+
+    test "ignore multiple keys" do
+      ~K{_ignored, _ignored_other, real_val} = [ignored: 5, ignored_other: 6, real_val: 19]
+      assert 19 = real_val
+    end
+
+    test "failed match" do
+      case Keyword.new(real_val: 19) do
+        ~K{_not_present, _real_val} -> raise("matched when testshouldn't have")
         _ -> :ok
       end
     end
@@ -302,9 +374,44 @@ defmodule TinyMapsTest do
   end
 
   describe "nested sigils" do
+    test "nested ~m inside of ~M" do
+      a = 1
+      b = 2
+      assert %{a: ^a, b: %{"b" => ^b}} = ~M{a, b: ~m(b)}
+    end
+
+    test "nested ~M inside of ~m" do
+      a = 1
+      b = 2
+      assert %{"a" => ^a, "b" => %{b: ^b}} = ~m{a, "b" => ~M(b)}
+    end
+
+    test "nested ~K inside of ~M" do
+      a = 1
+      b = 2
+      assert %{a: ^a, b: [b: ^b]} = ~M{a, b: ~K(b)}
+    end
+
+    test "nested ~M inside of ~K" do
+      a = 1
+      b = 2
+      assert [a: ^a, b: %{b: ^b}] = ~K{a, b: ~M(b)}
+    end
+
+    test "nested ~K inside of ~K" do
+      a = 1
+      b = 2
+      assert [a: ^a, b: [b: ^b]] = ~K{a, b: ~K(b)}
+    end
+
     test "two levels" do
       [a, b, c] = [1, 2, 3]
       assert %{a: ^a, b: %{b: ^b, c: ^c}} = ~M{a, b: ~M(b, c)}
+    end
+
+    test "three levels" do
+      [a, b, c] = [1, 2, 3]
+      assert %{a: ^a, b: %{b: ^b, c: %{c: ^c}}} = ~M{a, b: ~M(b, c: ~M[c])}
     end
   end
 

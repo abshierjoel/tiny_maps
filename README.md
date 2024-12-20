@@ -1,8 +1,9 @@
 ## TinyMaps
 
-_A successor to the [shorter_maps](https://github.com/meyercm/shorter_maps) package._
+_A successor to the [shorter_maps](https://github.com/meyercm/shorter_maps) package._ Now with keyword lists!
 
 `~M` sigil for map shorthand. `~M{a} ~> %{a: a}`
+`~K` sigil for keyword list shorthand. `~K{a} ~> [a: a]`
 
 [![Build Status](https://travis-ci.org/meyercm/shorter_maps.svg?branch=master)](https://travis-ci.org/meyercm/shorter_maps)
 
@@ -13,7 +14,7 @@ _A successor to the [shorter_maps](https://github.com/meyercm/shorter_maps) pack
 3. DRY up your maps and structs with `~M` and `~m`. Instead of `%{name: name}`
    use `~M{name}`, and for `%{"name" => name}` use `~m{name}`. When the key and
    the variable don't match, don't fret: `~M{name, id: current_id}` expands
-   to `%{name: name, id: current_id}`.
+   to `%{name: name, id: current_id}`. Now use the `~K` sigil to DRY up keyword lists.
 
 ### Motivation
 
@@ -27,7 +28,7 @@ the keys. `TinyMaps` provides that functionality to Elixir.
 
 ### Syntax:
 
-`~M` and `~m` can be used to replace maps **anywhere** in your code. The
+`~M`, `~m`, and `~K` can be used to replace maps **anywhere** in your code. The
 `TinyMaps` sigil syntax operates just like a vanilla elixir map, with two
 main differences:
 
@@ -79,6 +80,18 @@ iex> import TinyMaps
 ...> ~M{%MyStruct initial_struct|id}
 %MyStruct{name: "Chris", id: 6}
 
+# Keyword lists can be built with the ~K sigil
+...> a = 1
+...> b = 2
+...> ~K{a, b}
+[a: 1, b: 2]
+
+# And even nested
+...> a = 1
+...> b = 2
+...> ~K{a, b: ~K(b)}
+[a: 1, b: [b: 2]]
+
 # Because the expansion happens at compile time, they can be used __anywhere__:
 
 # in function heads:
@@ -109,6 +122,7 @@ located [here][original-repo]. The reasons for the divergence are summarized
 
 - Atom keys: `~M{a, b}` => `%{a: a, b: b}`
 - String keys: `~m{a, b}` => `%{"a" => a, "b" => b}`
+- Keyword lists: `~K{a, b, c: d} => [a: a, b: b, c: d]`
 - Structs: `~M{%Person id, name}` => `%Person{id: id, name: name}`
 - Pinned variables: `~M{^a, b}` => `%{a: ^a, b: b}`
 - Ignore matching: `~M{_a, b}` => `%{a: _a, b: b}`
