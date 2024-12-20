@@ -1,7 +1,7 @@
 defmodule TinyMaps.Mixfile do
   use Mix.Project
 
-  @version "3.0.0"
+  @version "3.1.0-rc.1"
   @repo_url "https://github.com/abshierjoel/tiny_maps"
 
   def project do
