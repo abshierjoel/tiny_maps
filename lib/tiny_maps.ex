@@ -191,12 +191,6 @@ defmodule TinyMaps do
             |> String.trim()
             |> expand_variable(modifier)
 
-          s =~ ~r/\A\s*#{@re_varname}\s*:\s*#{@re_varname}\s*\Z/ ->
-            s
-            |> String.trim()
-            |> String.split(":")
-            |> expand_kvp(modifier)
-
           true ->
             s
         end
@@ -205,9 +199,6 @@ defmodule TinyMaps do
 
     {:ok, result}
   end
-
-  defp expand_kvp([key, value], ?a), do: "#{key}: #{value}"
-  defp expand_kvp([key, value], ?s), do: "\"#{key}\" => #{value}"
 
   @doc false
   defp identify_entries(candidates, partial \\ "", acc \\ [])
